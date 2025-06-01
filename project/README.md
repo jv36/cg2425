@@ -1,9 +1,6 @@
 # CG 2024/2025
 
 ## Group T02G09
-### Clara Sousa - 202207582
-### João Mendes - 202208586
-### T02 - G09
 
 ## Project Notes
 
@@ -30,5 +27,3 @@ texturesOrColor is an argument that supports either textures or a solid color fo
 - Different colors can also be defined for each face of the building's modules. To do so, you must pass an array of 6 RGBA colors.
 
 ![Screenshot2](screenshots/project-t02g09-2.png)
-
-

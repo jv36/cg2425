@@ -25,11 +25,13 @@ export class MyScene extends CGFscene {
 
     //Background color
     this.gl.clearColor(0, 0, 0, 1.0);
-
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);    
     this.gl.clearDepth(100.0);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.depthFunc(this.gl.LEQUAL);
+
 
     this.enableTextures(true);
 
@@ -66,40 +68,6 @@ export class MyScene extends CGFscene {
     this.grassMaterial.setTexture(this.grassTexture);
     this.grassMaterial.setTextureWrap('REPEAT', 'REPEAT');
 
-    /*
-    this.grassBladeMaterial = new CGFappearance(this);
-    this.grassBladeMaterial.setAmbient(0.2, 0.8, 0.2, 1.0);
-    this.grassBladeMaterial.setDiffuse(0.2, 0.8, 0.2, 1.0);
-    this.grassBladeMaterial.setSpecular(0.0, 0.0, 0.0, 1.0);
-    this.grassBladeMaterial.setShininess(10.0);
-
-    this.grassPatches = [];
-    this.grassPositions = [];
-    const numPatches = 400;
-
-  
-    const gridSize = 20;
-    const spacing = 140.0 / gridSize;
-    
-    for (let row = 0; row < gridSize; row++) {
-        for (let col = 0; col < gridSize; col++) {
-            // Base position on grid
-            const baseX = (col - gridSize/2) * spacing;
-            const baseZ = (row - gridSize/2) * spacing;
-            
-            // Add some randomness to the position
-            const offsetX = (Math.random() - 0.5) * spacing * 0.5;
-            const offsetZ = (Math.random() - 0.5) * spacing * 0.5;
-            
-            this.grassPatches.push(new MyGrass(this, 1));
-            this.grassPositions.push({
-                x: baseX + offsetX,
-                z: baseZ + offsetZ
-            });
-        }
-    }
-    */
-
     this.quadMaterial = new CGFappearance(this);
     this.quadMaterial.setAmbient(0.1, 0.1, 0.1, 1);
     this.quadMaterial.setDiffuse(0.9, 0.9, 0.9, 1);
@@ -124,7 +92,6 @@ export class MyScene extends CGFscene {
     this.lake = new MyLake(this, -6, 2, 6); 
     this.forest = new MyForest(this, 4, 4); // por exemplo
     this.firePlace = new MyFirePlace(this, this.forest, 0.6); // densidade ajustável
-    //this.bucketAscendTarget = 13; // altura desejada após encher o balde
     this.speedFactor = 1; // valor inicial
     this.displayAxis = false;
   }
@@ -155,15 +122,17 @@ export class MyScene extends CGFscene {
     if (this.gui.isKeyPressed("KeyR")) this.heli.reset();
     if (this.gui.isKeyPressed("KeyL")) {
       if (this.heli.isOverLake(this.lake)) {
-          this.building?.resetHelipad(); // ← força o heliporto a mostrar "H"
-    
+          this.building?.resetHelipad(); // força o heliporto a mostrar "H"
+  
           if (!this.heli.bucketFilled) {
-          this.heli.descend();
-      } else {
+              this.heli.descend();
+          } else {
               this.heli.ascend();
           }
-      }  
-    } else if (this.gui.isKeyPressed("KeyP")) {
+      } else {
+          this.heli.reset(); // ← reset quando clica "L" fora do lago
+      }
+  } else if (this.gui.isKeyPressed("KeyP")) {
       this.heli.ascend(); // sobe normalmente (sem limite)
   } else {
       this.heli.neutralVertical();
@@ -232,21 +201,6 @@ export class MyScene extends CGFscene {
     this.grassMaterial.apply();
     this.plane.display();
     this.popMatrix();
-
-    /*
-    // Display 3D grass patches (off for now - vic)
-
-    this.grassBladeMaterial.apply();
-    this.gl.disable(this.gl.CULL_FACE);
-    for (let i = 0; i < this.grassPatches.length; i++) {
-        this.pushMatrix();
-        const pos = this.grassPositions[i];
-        this.translate(pos.x, 0.01, pos.z);
-        this.scale(3, 3, 3);
-        this.grassPatches[i].display();
-        this.popMatrix();
-    }
-    */
 
     this.gl.enable(this.gl.CULL_FACE);
 

@@ -1,7 +1,7 @@
-import { CGFobject, CGFappearance, CGFtexture } from "../lib/CGF.js";
+import { CGFobject, CGFappearance } from "../lib/CGF.js";
 import { MyCylinder } from "./MyCylinder.js";
 import { MySphere } from "./MySphere.js";
-import { MyPyramid } from "./MyPyramid.js";
+import { MyCircle } from "./MyCircle.js";
 import { MyCube } from "./MyCube.js";
 
 export class MyHeli extends CGFobject {
@@ -39,6 +39,16 @@ export class MyHeli extends CGFobject {
         this.verticalFriction = 4; // desaceleração automática (ajustável)
         this.verticalBoost = 10; // força aplicada quando pressionas (ajustável)
 
+        this.waterTexture = new CGFappearance(scene);
+        this.waterTexture.setAmbient(0.3, 0.3, 0.6, 1);
+        this.waterTexture.setDiffuse(0.5, 0.5, 1.0, 1);
+        this.waterTexture.setSpecular(0.9, 0.9, 1.0, 1);
+        this.waterTexture.setShininess(100);
+        this.waterTexture.loadTexture('images/waterTex.jpg'); // certifica-te de que esta imagem existe
+        this.waterTexture.setTextureWrap('REPEAT', 'REPEAT');
+
+        this.bucketWaterDisk = new MyCircle(scene, 20); // um círculo no topo da base
+
         // Water bucket properties
         this.bucketFilled = false;
         this.bucketEmpty = true;
@@ -75,21 +85,17 @@ export class MyHeli extends CGFobject {
 
         // Criação com materiais por cor
         this.bodyMaterial = new CGFappearance(scene);
-        this.bodyMaterial.setAmbient(0.6, 0.1, 0.1, 1);  // vermelho escuro
-        this.bodyMaterial.setDiffuse(0.6, 0.1, 0.1, 1);
-        this.bodyMaterial.setSpecular(0.1, 0.1, 0.1, 1);
-        this.bodyMaterial.setShininess(10);
-
-        this.bodyTexture = new CGFtexture(this.scene, "images/earth.jpg");
-        this.bodyMaterial.setTexture(this.bodyTexture);
-        this.bodyMaterial.setTextureWrap("CLAMP_TO_EDGE", "CLAMP_TO_EDGE");
-
+        this.bodyMaterial.setAmbient(0.4, 0.0, 0.0, 1);     
+        this.bodyMaterial.setDiffuse(0.6, 0.1, 0.1, 1);     
+        this.bodyMaterial.setSpecular(0.1, 0.1, 0.1, 1);    
+        this.bodyMaterial.setShininess(20);                 
+        
         this.windowMaterial = new CGFappearance(scene);
-        this.windowMaterial.setAmbient(0.1, 0.1, 0.3, 1);
-        this.windowMaterial.setDiffuse(0.4, 0.4, 0.8, 1);
-        this.windowMaterial.setSpecular(0.7, 0.7, 0.9, 1);
-        this.windowMaterial.setShininess(100);
-
+        this.windowMaterial.setAmbient(0.35, 0.45, 0.55, 0.25); 
+        this.windowMaterial.setDiffuse(0.5, 0.6, 0.7, 0.25);    
+        this.windowMaterial.setSpecular(0.2, 0.2, 0.2, 0.25);   
+        this.windowMaterial.setShininess(20);                   
+                           
         this.bucketMaterial = new CGFappearance(scene);
         this.bucketMaterial.setAmbient(0.3, 0.3, 0.3, 1);
         this.bucketMaterial.setDiffuse(0.5, 0.5, 0.5, 1);
@@ -436,16 +442,21 @@ export class MyHeli extends CGFobject {
         // Balde de água
         this.scene.pushMatrix();
         this.scene.translate(0, -3, 0);       // Posição vertical sob o helicóptero
-        this.scene.scale(0.8, 0.8, 0.8);        // Escala para parecer um balde
-        if (this.bucketFilled) {
-            // Change bucket appearance when filled with water
-            this.windowMaterial.apply(); // Use window material (blue) when filled
-        } else {
-            this.bucketMaterial.apply();
-        }
+        this.scene.scale(0.8, 0.8, 0.8);      // Escala para parecer um balde
+        this.bucketMaterial.apply();      // Balde cinzento
         this.bucket.display();
         this.scene.popMatrix();
-
+        
+        if (this.bucketFilled) {
+            this.scene.pushMatrix();
+            this.scene.translate(0, -2.6, 0); // ligeiramente acima do fundo do balde
+            this.scene.rotate(-Math.PI / 2, 1, 0, 0); // orienta o círculo na horizontal
+            this.scene.scale(0.7, 0.7, 0.7); // ligeiramente menor que o balde
+            this.waterTexture.apply();
+            this.bucketWaterDisk.display(); // superfície da água
+            this.scene.popMatrix();
+        }
+        
         // Corpo principal
         this.scene.pushMatrix();
         this.scene.scale(2, 1.2, 0.8);
